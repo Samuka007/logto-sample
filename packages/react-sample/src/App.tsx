@@ -7,6 +7,7 @@ import Callback from './pages/Callback';
 import Home from './pages/Home';
 import Organizations from './pages/Organizations';
 import ProtectedResource from './pages/ProtectedResource';
+import ApiTest from './pages/ApiTest';
 import './App.module.scss';
 import ReactQuery from './pages/ReactQuery';
 
@@ -21,6 +22,9 @@ export const App = () => {
       UserScope.Identities,
       UserScope.Organizations,
     ],
+    resources: [
+      'https://your-backend-api', // 对应Logto控制台中创建的API资源标识符
+    ],
   };
 
   return (
@@ -33,6 +37,7 @@ export const App = () => {
             <Route index element={<ProtectedResource />} />
             <Route path="react-query" element={<ReactQuery />} />
             <Route path="organizations" element={<Organizations />} />
+            <Route path="api-test" element={<ApiTest />} />
           </Route>
         </Routes>
       </LogtoProvider>

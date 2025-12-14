@@ -80,6 +80,9 @@ const Home = () => {
             <li>
               <Link to="/protected/organizations">View organizations</Link>
             </li>
+            <li>
+              <Link to="/protected/api-test">🔐 测试前后端鉴权</Link>
+            </li>
           </ul>
         </>
       )}
