@@ -4,6 +4,13 @@
 <head>
     <meta charset="utf-8" />
     <title>Logto React SDK Sample</title>
+    <script>
+        // 支持通过 HTML 中的 window 对象注入配置，用于运行时动态修改
+        // 使用方法：在部署时通过 Nginx 或 Docker 脚本替换这个配置
+        if (!window.__LOGTO_CONFIG__) {
+            window.__LOGTO_CONFIG__ = {};
+        }
+    </script>
 </head>
 
 <body>

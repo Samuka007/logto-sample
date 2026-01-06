@@ -19,11 +19,11 @@ const ApiTest = () => {
       setLoading(true);
       // 获取对应API资源的access token
       const accessToken = await getAccessToken('https://api.contextid.cn');
-      setToken(accessToken || '未获取到token');
+      setToken(accessToken ?? '未获取到token');
       console.log('Access Token:', accessToken);
     } catch (error) {
       console.error('获取token失败:', error);
-      setToken('获取token失败: ' + (error as Error).message);
+      setToken(`获取token失败: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ const ApiTest = () => {
       setLoading(true);
       // 获取access token
       const accessToken = await getAccessToken('https://your-backend-api');
-      
+
       if (!accessToken) {
         setApiResponse('❌ 无法获取access token');
         return;
@@ -50,21 +50,35 @@ const ApiTest = () => {
       const response = await fetch('http://localhost:8081/api/v1/users/me', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       });
 
-      const data = await response.json();
-      
+      const data: unknown = await response.json();
+
       if (response.ok) {
-        setApiResponse(`✅ API调用成功!\n\n状态码: ${response.status}\n响应数据:\n${JSON.stringify(data, null, 2)}`);
+        setApiResponse(
+          `✅ API调用成功!\n\n状态码: ${response.status}\n响应数据:\n${JSON.stringify(
+            data,
+            null,
+            2
+          )}`
+        );
       } else {
-        setApiResponse(`❌ API调用失败!\n\n状态码: ${response.status}\n错误信息:\n${JSON.stringify(data, null, 2)}`);
+        setApiResponse(
+          `❌ API调用失败!\n\n状态码: ${response.status}\n错误信息:\n${JSON.stringify(
+            data,
+            null,
+            2
+          )}`
+        );
       }
     } catch (error) {
       console.error('API调用失败:', error);
-      setApiResponse(`❌ API调用失败!\n\n错误信息: ${(error as Error).message}`);
+      setApiResponse(
+        `❌ API调用失败!\n\n错误信息: ${error instanceof Error ? error.message : String(error)}`
+      );
     } finally {
       setLoading(false);
     }
@@ -73,7 +87,7 @@ const ApiTest = () => {
   return (
     <div className="container">
       <h1>🔐 前后端鉴权测试</h1>
-      
+
       <div className="section">
         <h2>1. 检查登录状态</h2>
         <p>登录状态: {isAuthenticated ? '✅ 已登录' : '❌ 未登录'}</p>
@@ -81,21 +95,17 @@ const ApiTest = () => {
 
       <div className="section">
         <h2>2. 获取Access Token</h2>
-        <button 
-          onClick={handleGetToken} 
-          disabled={loading || !isAuthenticated}
-          className="button"
-        >
+        <button className="button" disabled={loading || !isAuthenticated} onClick={handleGetToken}>
           {loading ? '获取中...' : '获取Access Token'}
         </button>
         {token && (
           <div className="token-display">
             <h3>Token内容:</h3>
-            <textarea 
-              value={token} 
-              readOnly 
+            <textarea
+              readOnly
               rows={4}
               style={{ width: '100%', fontSize: '12px', fontFamily: 'monospace' }}
+              value={token}
             />
             <p className="token-type">
               {token.startsWith('eyJ') ? '✅ 这是JWT格式的token' : '⚠️ 这可能是Opaque Token'}
@@ -106,11 +116,13 @@ const ApiTest = () => {
 
       <div className="section">
         <h2>3. 测试后端API调用</h2>
-        <p>测试调用: <code>GET /api/v1/users/me</code></p>
-        <button 
-          onClick={handleCallApi} 
-          disabled={loading || !isAuthenticated}
+        <p>
+          测试调用: <code>GET /api/v1/users/me</code>
+        </p>
+        <button
           className="button primary"
+          disabled={loading || !isAuthenticated}
+          onClick={handleCallApi}
         >
           {loading ? '调用中...' : '调用后端API'}
         </button>
@@ -127,7 +139,9 @@ const ApiTest = () => {
         <h2>📋 测试说明</h2>
         <ul>
           <li>第一步：确认是否已登录</li>
-          <li>第二步：点击获取Access Token，应该能看到以 <code>eyJ</code> 开头的JWT</li>
+          <li>
+            第二步：点击获取Access Token，应该能看到以 <code>eyJ</code> 开头的JWT
+          </li>
           <li>第三步：点击调用后端API，测试鉴权是否正常工作</li>
           <li>如果API调用成功，说明前后端鉴权配置正确</li>
         </ul>
