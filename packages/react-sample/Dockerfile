@@ -50,13 +50,24 @@ RUN cat > /docker-entrypoint.sh << 'EOF'
 #!/bin/sh
 set -e
 
+echo "=== Docker Entrypoint Script ==="
+echo "LOGTO_APP_ID: $LOGTO_APP_ID"
+echo "LOGTO_ENDPOINT: $LOGTO_ENDPOINT"
+
 # 如果提供了环境变量，动态注入到 index.html
 if [ -n "$LOGTO_APP_ID" ] || [ -n "$LOGTO_ENDPOINT" ]; then
     APP_ID="${LOGTO_APP_ID:-l0ztgtbtuua0vyc5ti5ds}"
     ENDPOINT="${LOGTO_ENDPOINT:-https://jerry-test-logto-api.zeabur.app/}"
     
-    # 在 index.html 中注入配置
-    sed -i.bak "s|window.__LOGTO_CONFIG__ = {}|window.__LOGTO_CONFIG__ = { APP_ID: '$APP_ID', ENDPOINT: '$ENDPOINT' }|g" /usr/share/nginx/html/index.html
+    echo "Injecting config: APP_ID=$APP_ID, ENDPOINT=$ENDPOINT"
+    
+    # 在 index.html 中注入配置（匹配压缩后的格式）
+    sed -i.bak "s|window.__LOGTO_CONFIG__\|\|(window.__LOGTO_CONFIG__={});|window.__LOGTO_CONFIG__={APP_ID:'$APP_ID',ENDPOINT:'$ENDPOINT'};|g" /usr/share/nginx/html/index.html
+    
+    echo "After sed replacement:"
+    grep "__LOGTO_CONFIG__" /usr/share/nginx/html/index.html || echo "Pattern not found"
+else
+    echo "No environment variables provided, using defaults"
 fi
 
 # 启动 Nginx

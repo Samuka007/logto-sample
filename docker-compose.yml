@@ -1,0 +1,10 @@
+services:
+  react-sample:
+    build:
+      context: .
+      dockerfile: packages/react-sample/Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - LOGTO_APP_ID=abcde
+      - LOGTO_ENDPOINT=https://example.logto.io
